@@ -69,13 +69,27 @@ export default function ConversationScreen({ config, onBack }: Props) {
   }, [hasStarted, messages.length, config, sendMessage])
 
   const doStartListening = useCallback(() => {
-    setWaitingForTap(false)
+    // Don't hide button yet — wait until isListening confirms mic is active
     startListening((finalText) => {
+      setWaitingForTap(false)
       stopSpeaking()
       sendMessage(finalText)
       setInput('')
     })
   }, [startListening, stopSpeaking, sendMessage])
+
+  // On mobile: if mic stops without sending, bring the tap button back
+  useEffect(() => {
+    if (isMobile && waitingForTap && !isListening && !aiSpeaking && !isLoading) {
+      // mic ended without result — keep button visible so user can tap again
+      setWaitingForTap(true)
+    }
+  }, [isListening]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Hide tap button once mic is confirmed active
+  useEffect(() => {
+    if (isListening) setWaitingForTap(false)
+  }, [isListening])
 
   // Auto-speak AI message, then auto-activate mic when done
   useEffect(() => {
@@ -246,14 +260,16 @@ export default function ConversationScreen({ config, onBack }: Props) {
       </div>
 
       {/* Mobile: Tap to Speak button */}
-      {isMobile && waitingForTap && !isListening && !aiSpeaking && (
+      {isMobile && waitingForTap && !aiSpeaking && (
         <div className="px-4 pb-2 flex justify-center">
           <button
             onClick={doStartListening}
             className="flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 0 30px rgba(239,68,68,0.5)' }}>
-            <Mic size={24} />
-            Tap to Speak
+            style={isListening
+              ? { background: 'linear-gradient(135deg, #16a34a, #15803d)', boxShadow: '0 0 30px rgba(22,163,74,0.5)' }
+              : { background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 0 30px rgba(239,68,68,0.5)' }}>
+            {isListening ? <MicOff size={24} /> : <Mic size={24} />}
+            {isListening ? 'Listening... tap to stop' : 'Tap to Speak'}
           </button>
         </div>
       )}
