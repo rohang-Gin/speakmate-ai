@@ -156,7 +156,7 @@ export function useSpeech(): UseSpeechReturn {
     return recognition
   }, [sendFinal])
 
-  const startListening = useCallback((onFinal?: (text: string) => void) => {
+  const startListening = useCallback(async (onFinal?: (text: string) => void) => {
     if (!supported) return
 
     synthRef.current?.cancel()
