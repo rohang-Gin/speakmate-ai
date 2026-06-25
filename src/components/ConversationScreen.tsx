@@ -29,6 +29,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
   const [aiSpeaking, setAiSpeaking] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [waitingForTap, setWaitingForTap] = useState(false)
+  const [debugLog, setDebugLog] = useState<string[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -68,15 +69,20 @@ export default function ConversationScreen({ config, onBack }: Props) {
     }
   }, [hasStarted, messages.length, config, sendMessage])
 
+  const addLog = useCallback((msg: string) => {
+    setDebugLog(prev => [...prev.slice(-6), `${new Date().toLocaleTimeString()}: ${msg}`])
+  }, [])
+
   const doStartListening = useCallback(() => {
-    // Don't hide button yet — wait until isListening confirms mic is active
+    addLog(`tap! supported=${supported} isListening=${isListening}`)
     startListening((finalText) => {
+      addLog(`got text: "${finalText.slice(0, 30)}"`)
       setWaitingForTap(false)
       stopSpeaking()
       sendMessage(finalText)
       setInput('')
     })
-  }, [startListening, stopSpeaking, sendMessage])
+  }, [startListening, stopSpeaking, sendMessage, supported, isListening, addLog])
 
   // On mobile: if mic stops without sending, bring the tap button back
   useEffect(() => {
@@ -88,8 +94,9 @@ export default function ConversationScreen({ config, onBack }: Props) {
 
   // Hide tap button once mic is confirmed active
   useEffect(() => {
+    addLog(`isListening changed → ${isListening}`)
     if (isListening) setWaitingForTap(false)
-  }, [isListening])
+  }, [isListening]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-speak AI message, then auto-activate mic when done
   useEffect(() => {
@@ -258,6 +265,13 @@ export default function ConversationScreen({ config, onBack }: Props) {
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Debug panel — remove after fixing */}
+      {isMobile && debugLog.length > 0 && (
+        <div className="mx-4 mb-2 p-3 rounded-xl text-xs font-mono space-y-1" style={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,0,0.3)' }}>
+          {debugLog.map((line, i) => <div key={i} className="text-yellow-300">{line}</div>)}
+        </div>
+      )}
 
       {/* Mobile: Tap to Speak button */}
       {isMobile && waitingForTap && !aiSpeaking && (

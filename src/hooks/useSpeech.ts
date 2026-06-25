@@ -158,7 +158,6 @@ export function useSpeech(): UseSpeechReturn {
   const startListening = useCallback((onFinal?: (text: string) => void) => {
     if (!supported) return
 
-    // Stop AI speaking when user starts talking
     synthRef.current?.cancel()
     setIsSpeaking(false)
 
@@ -168,7 +167,6 @@ export function useSpeech(): UseSpeechReturn {
     shouldRestartRef.current = true
     clearSilenceTimer()
 
-    // Stop any existing recognition first
     try { recognitionRef.current?.stop() } catch { /* ignore */ }
 
     const recognition = createRecognition()
@@ -177,7 +175,6 @@ export function useSpeech(): UseSpeechReturn {
     try {
       recognition.start()
     } catch (e) {
-      console.error('Failed to start recognition:', e)
       shouldRestartRef.current = false
       setIsListening(false)
     }
