@@ -250,7 +250,9 @@ export default function ConversationScreen({ config, onBack }: Props) {
           </div>
         )}
 
-        {messages.filter(m => m.content && !m.content.startsWith('[SYSTEM')).map(msg => <MessageBubble key={msg.id} message={msg} />)}
+        {messages.filter(m => m.content && !m.content.startsWith('[SYSTEM')).map(msg => (
+          <MessageBubble key={msg.id} message={msg} onReplay={(text) => { stopSpeaking(); speak(text) }} />
+        ))}
 
         {isLoading && (
           <div className="flex gap-3">
@@ -356,9 +358,19 @@ export default function ConversationScreen({ config, onBack }: Props) {
   )
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (text: string) => void }) {
   const [showCorrection, setShowCorrection] = useState(true)
+  const [isReplaying, setIsReplaying] = useState(false)
   const isUser = message.role === 'user'
+
+  const handleReplay = () => {
+    if (!message.content || isReplaying) return
+    setIsReplaying(true)
+    onReplay?.(message.content)
+    // Reset icon after estimated speech duration
+    const ms = (message.content.split(' ').length / 2.5) * 1000 + 500
+    setTimeout(() => setIsReplaying(false), ms)
+  }
 
   return (
     <div className={`flex gap-3 slide-up ${isUser ? 'flex-row-reverse' : ''}`}>
@@ -382,6 +394,16 @@ function MessageBubble({ message }: { message: Message }) {
             ? { background: 'linear-gradient(135deg, rgba(16,185,129,0.3), rgba(5,150,105,0.2))', border: '1px solid rgba(16,185,129,0.3)' }
             : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
           {message.content}
+          {!isUser && (
+            <button
+              onClick={handleReplay}
+              className="mt-2 flex items-center gap-1.5 text-xs transition-colors"
+              style={{ color: isReplaying ? '#818cf8' : '#475569' }}>
+              {isReplaying
+                ? <><Volume2 size={13} className="animate-pulse" /> Playing...</>
+                : <><Volume2 size={13} /> Replay</>}
+            </button>
+          )}
         </div>
 
         {/* Follow-up questions */}
