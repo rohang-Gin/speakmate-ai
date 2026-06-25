@@ -173,6 +173,17 @@ export function useSpeech(): UseSpeechReturn {
     const recognition = createRecognition()
     recognitionRef.current = recognition
 
+    // Request mic permission explicitly first — this triggers the browser popup
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      stream.getTracks().forEach(t => t.stop()) // release immediately, we just needed permission
+    } catch (e) {
+      setLastError(`mic-permission-denied: ${e}`)
+      shouldRestartRef.current = false
+      setIsListening(false)
+      return
+    }
+
     try {
       recognition.start()
       setLastError('start() called...')
