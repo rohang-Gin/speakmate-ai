@@ -45,7 +45,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
       onSessionEnd: (report) => setSessionReport(report),
     })
 
-  const { isListening, transcript, startListening, stopListening, speak, stopSpeaking, supported } = useSpeech()
+  const { isListening, transcript, startListening, stopListening, speak, stopSpeaking, supported, lastError } = useSpeech()
 
   useEffect(() => { setIsMobile(checkIsMobile()) }, [])
 
@@ -92,11 +92,14 @@ export default function ConversationScreen({ config, onBack }: Props) {
     }
   }, [isListening]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Hide tap button once mic is confirmed active
   useEffect(() => {
-    addLog(`isListening changed → ${isListening}`)
+    addLog(`isListening → ${isListening}`)
     if (isListening) setWaitingForTap(false)
   }, [isListening]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (lastError) addLog(`SPEECH: ${lastError}`)
+  }, [lastError, addLog])
 
   // Auto-speak AI message, then auto-activate mic when done
   useEffect(() => {

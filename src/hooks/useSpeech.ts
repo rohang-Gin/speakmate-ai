@@ -10,6 +10,7 @@ interface UseSpeechReturn {
   stopSpeaking: () => void
   isSpeaking: boolean
   supported: boolean
+  lastError: string
 }
 
 function isMobile(): boolean {
@@ -22,6 +23,7 @@ export function useSpeech(): UseSpeechReturn {
   const [transcript, setTranscript] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [supported, setSupported] = useState(false)
+  const [lastError, setLastError] = useState('')
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const synthRef = useRef<SpeechSynthesis | null>(null)
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -131,8 +133,8 @@ export function useSpeech(): UseSpeechReturn {
     }
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      setLastError(`err:${event.error} @${new Date().toLocaleTimeString()}`)
       if (event.error === 'no-speech') {
-        // On mobile, no-speech ends the session — restart if we should still be listening
         if (shouldRestartRef.current && !hasSentRef.current) {
           try {
             const newRecognition = createRecognition()
@@ -146,7 +148,6 @@ export function useSpeech(): UseSpeechReturn {
         return
       }
       if (event.error === 'aborted') return
-      console.error('Speech recognition error:', event.error)
       clearSilenceTimer()
       shouldRestartRef.current = false
       setIsListening(false)
@@ -174,7 +175,9 @@ export function useSpeech(): UseSpeechReturn {
 
     try {
       recognition.start()
+      setLastError('start() called...')
     } catch (e) {
+      setLastError(`start() threw: ${e}`)
       shouldRestartRef.current = false
       setIsListening(false)
     }
@@ -226,5 +229,5 @@ export function useSpeech(): UseSpeechReturn {
     setIsSpeaking(false)
   }, [])
 
-  return { isListening, transcript, startListening, stopListening, speak, stopSpeaking, isSpeaking, supported }
+  return { isListening, transcript, startListening, stopListening, speak, stopSpeaking, isSpeaking, supported, lastError }
 }
