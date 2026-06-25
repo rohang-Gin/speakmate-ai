@@ -4,6 +4,11 @@ import {
   ArrowLeft, Mic, MicOff, Send, Volume2, VolumeX,
   RotateCcw, ChevronRight, AlertCircle, Lightbulb, Sparkles
 } from 'lucide-react'
+
+function checkIsMobile() {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+}
 import { ConversationConfig } from '@/app/page'
 import { useConversation } from '@/hooks/useConversation'
 import { useSpeech } from '@/hooks/useSpeech'
@@ -22,6 +27,8 @@ export default function ConversationScreen({ config, onBack }: Props) {
   const [sessionReport, setSessionReport] = useState<SessionReport | null>(null)
   const [hasStarted, setHasStarted] = useState(false)
   const [aiSpeaking, setAiSpeaking] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [waitingForTap, setWaitingForTap] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -38,6 +45,8 @@ export default function ConversationScreen({ config, onBack }: Props) {
     })
 
   const { isListening, transcript, startListening, stopListening, speak, stopSpeaking, supported } = useSpeech()
+
+  useEffect(() => { setIsMobile(checkIsMobile()) }, [])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -59,6 +68,15 @@ export default function ConversationScreen({ config, onBack }: Props) {
     }
   }, [hasStarted, messages.length, config, sendMessage])
 
+  const doStartListening = useCallback(() => {
+    setWaitingForTap(false)
+    startListening((finalText) => {
+      stopSpeaking()
+      sendMessage(finalText)
+      setInput('')
+    })
+  }, [startListening, stopSpeaking, sendMessage])
+
   // Auto-speak AI message, then auto-activate mic when done
   useEffect(() => {
     if (messages.length === 0) return
@@ -67,15 +85,20 @@ export default function ConversationScreen({ config, onBack }: Props) {
       const wordCount = last.content.split(' ').length
       const estimatedMs = (wordCount / 2.5) * 1000 + 1200
 
-      const autoStartMic = () => {
+      const afterAiSpeaks = () => {
         setTimeout(() => {
           setAiSpeaking(false)
           if (!isListening) {
-            startListening((finalText) => {
-              stopSpeaking()
-              sendMessage(finalText)
-              setInput('')
-            })
+            if (isMobile) {
+              // Mobile: can't auto-start mic — needs a user tap
+              setWaitingForTap(true)
+            } else {
+              startListening((finalText) => {
+                stopSpeaking()
+                sendMessage(finalText)
+                setInput('')
+              })
+            }
           }
         }, 600)
       }
@@ -83,9 +106,9 @@ export default function ConversationScreen({ config, onBack }: Props) {
       if (autoSpeak) {
         setAiSpeaking(true)
         speak(last.content)
-        setTimeout(autoStartMic, estimatedMs)
+        setTimeout(afterAiSpeaks, estimatedMs)
       } else {
-        autoStartMic()
+        afterAiSpeaks()
       }
     }
   }, [messages]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -222,6 +245,19 @@ export default function ConversationScreen({ config, onBack }: Props) {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Mobile: Tap to Speak button */}
+      {isMobile && waitingForTap && !isListening && !aiSpeaking && (
+        <div className="px-4 pb-2 flex justify-center">
+          <button
+            onClick={doStartListening}
+            className="flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 0 30px rgba(239,68,68,0.5)' }}>
+            <Mic size={24} />
+            Tap to Speak
+          </button>
+        </div>
+      )}
+
       {/* Input */}
       <div className="px-4 py-3"
         style={{ background: 'rgba(6,8,15,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -252,8 +288,10 @@ export default function ConversationScreen({ config, onBack }: Props) {
             <button onClick={() => {
               if (isListening) {
                 stopListening()
+                setWaitingForTap(false)
               } else {
                 setInput('')
+                setWaitingForTap(false)
                 startListening((finalText) => {
                   stopSpeaking()
                   sendMessage(finalText)
