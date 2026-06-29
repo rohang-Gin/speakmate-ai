@@ -92,12 +92,8 @@ export function useSpeech(): UseSpeechReturn {
       const displayText = accumulatedRef.current + interimText
       setTranscript(displayText.trim())
 
-      // On mobile with non-continuous mode, send as soon as we get a final result
-      if (mobile && accumulatedRef.current.trim()) {
-        silenceTimerRef.current = setTimeout(() => sendFinal(), 800)
-      } else {
-        silenceTimerRef.current = setTimeout(() => sendFinal(), 1800)
-      }
+      // Wait for silence before sending — longer pause = user finished speaking
+      silenceTimerRef.current = setTimeout(() => sendFinal(), mobile ? 2500 : 2800)
     }
 
     recognition.onend = () => {

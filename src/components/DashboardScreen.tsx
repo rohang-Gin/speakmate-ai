@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Flame, Clock, MessageCircle, Star, Award, TrendingUp, Zap } from 'lucide-react'
+import { ArrowLeft, Flame, Clock, MessageCircle, Award, TrendingUp, Zap, CalendarDays, Mic } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { loadProgress, getWeeklyScores } from '@/lib/storage'
+import { loadProgress, getWeeklyScores, getWeeklyReport } from '@/lib/storage'
 import { UserProgress } from '@/types'
 import { BADGE_INFO } from '@/lib/constants'
 
@@ -11,11 +11,13 @@ interface Props { onBack: () => void }
 export default function DashboardScreen({ onBack }: Props) {
   const [progress, setProgress] = useState<UserProgress | null>(null)
   const [chartData, setChartData] = useState<ReturnType<typeof getWeeklyScores>>([])
+  const [weeklyReport, setWeeklyReport] = useState<ReturnType<typeof getWeeklyReport> | null>(null)
 
   useEffect(() => {
     const p = loadProgress()
     setProgress(p)
     setChartData(getWeeklyScores(p.sessionHistory))
+    setWeeklyReport(getWeeklyReport())
   }, [])
 
   if (!progress) return null
@@ -58,6 +60,45 @@ export default function DashboardScreen({ onBack }: Props) {
             </div>
           ))}
         </div>
+
+        {/* Weekly Report Card */}
+        {weeklyReport && weeklyReport.totalSessions > 0 && (
+          <div className="rounded-3xl p-5"
+            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))', border: '1px solid rgba(99,102,241,0.3)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <CalendarDays size={16} className="text-indigo-400" />
+              <h3 className="text-white font-bold">This Week's Report</h3>
+              <span className="ml-auto text-xs text-indigo-400 font-semibold">Last 7 days</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Sessions',      value: weeklyReport.totalSessions,  sub: 'this week',         color: '#6366f1' },
+                { label: 'Minutes',       value: weeklyReport.totalMinutes,   sub: 'speaking time',     color: '#10b981' },
+                { label: 'Avg Score',     value: weeklyReport.avgScore,       sub: 'out of 100',        color: '#f59e0b' },
+                { label: 'Avg Speed',     value: `${weeklyReport.avgWpm}`,    sub: 'words per minute',  color: '#a855f7' },
+              ].map(s => (
+                <div key={s.label} className="rounded-2xl p-3.5"
+                  style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p className="text-slate-400 text-xs mb-1">{s.label}</p>
+                  <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
+                  <p className="text-slate-600 text-xs mt-0.5">{s.sub}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 rounded-2xl p-3 flex items-center gap-2"
+              style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <Mic size={13} className="text-purple-400 flex-shrink-0" />
+              <p className="text-slate-400 text-xs">
+                You spoke <span className="text-white font-bold">{weeklyReport.totalWords.toLocaleString()} words</span> this week
+                {weeklyReport.avgWpm >= 120
+                  ? ' — Great speaking pace!'
+                  : weeklyReport.avgWpm >= 80
+                  ? ' — Keep practicing to improve speed!'
+                  : ' — Try to speak a little faster!'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Chart */}
         {chartData.length > 0 && (

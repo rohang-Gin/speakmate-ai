@@ -4,6 +4,53 @@ const KEYS = {
   PROGRESS: 'speakmate_progress',
   CURRENT_LEVEL: 'speakmate_level',
   VOICE_PREFS: 'speakmate_voice_prefs',
+  CONVERSATIONS: 'speakmate_conversations',
+}
+
+export interface SavedConversation {
+  id: string
+  date: string
+  title: string
+  mode: string
+  messages: { role: 'user' | 'assistant'; content: string }[]
+  score: { grammar: number; vocabulary: number; fluency: number; overall: number }
+  duration: number
+  wordCount: number
+  wpm: number
+}
+
+export function saveConversation(conv: SavedConversation): void {
+  if (typeof window === 'undefined') return
+  try {
+    const existing = getConversations()
+    const updated = [conv, ...existing].slice(0, 50)
+    localStorage.setItem(KEYS.CONVERSATIONS, JSON.stringify(updated))
+  } catch { /* ignore */ }
+}
+
+export function getConversations(): SavedConversation[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(KEYS.CONVERSATIONS)
+    if (!raw) return []
+    return JSON.parse(raw) as SavedConversation[]
+  } catch { return [] }
+}
+
+export function getWeeklyReport() {
+  const conversations = getConversations()
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const thisWeek = conversations.filter(c => new Date(c.date).getTime() > sevenDaysAgo)
+
+  const totalSessions = thisWeek.length
+  const totalMinutes = Math.round(thisWeek.reduce((a, c) => a + c.duration, 0) / 60)
+  const avgScore = totalSessions > 0
+    ? Math.round(thisWeek.reduce((a, c) => a + c.score.overall, 0) / totalSessions) : 0
+  const avgWpm = totalSessions > 0
+    ? Math.round(thisWeek.reduce((a, c) => a + c.wpm, 0) / totalSessions) : 0
+  const totalWords = thisWeek.reduce((a, c) => a + c.wordCount, 0)
+
+  return { totalSessions, totalMinutes, avgScore, avgWpm, totalWords }
 }
 
 export interface VoicePreferences {

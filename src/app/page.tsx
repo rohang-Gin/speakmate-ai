@@ -5,6 +5,7 @@ import ConversationScreen from '@/components/ConversationScreen'
 import DashboardScreen from '@/components/DashboardScreen'
 import VocabularyScreen from '@/components/VocabularyScreen'
 import SettingsScreen from '@/components/SettingsScreen'
+import HistoryScreen from '@/components/HistoryScreen'
 import { ConversationMode, RoleplayScenario, InterviewMode } from '@/types'
 
 export type Screen =
@@ -13,6 +14,7 @@ export type Screen =
   | 'dashboard'
   | 'vocabulary'
   | 'settings'
+  | 'history'
 
 export interface ConversationConfig {
   mode: ConversationMode
@@ -39,16 +41,10 @@ export default function App() {
   return (
     <main className="min-h-screen bg-surface">
       {screen === 'home' && (
-        <HomeScreen
-          onStartConversation={startConversation}
-          onNavigate={setScreen}
-        />
+        <HomeScreen onStartConversation={startConversation} onNavigate={setScreen} />
       )}
       {screen === 'conversation' && convConfig && (
-        <ConversationScreen
-          config={convConfig}
-          onBack={goHome}
-        />
+        <ConversationScreen config={convConfig} onBack={goHome} />
       )}
       {screen === 'dashboard' && (
         <DashboardScreen onBack={() => setScreen('home')} />
@@ -58,6 +54,9 @@ export default function App() {
       )}
       {screen === 'settings' && (
         <SettingsScreen onBack={() => setScreen('home')} />
+      )}
+      {screen === 'history' && (
+        <HistoryScreen onBack={() => setScreen('home')} />
       )}
     </main>
   )

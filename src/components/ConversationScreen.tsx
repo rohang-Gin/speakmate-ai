@@ -13,7 +13,7 @@ import { ConversationConfig } from '@/app/page'
 import { useConversation } from '@/hooks/useConversation'
 import { useSpeech } from '@/hooks/useSpeech'
 import { Message, SessionReport } from '@/types'
-import { getVoicePreferences, VoicePreferences } from '@/lib/storage'
+import { getVoicePreferences, VoicePreferences, saveConversation } from '@/lib/storage'
 import SessionReportCard from './SessionReportCard'
 import { CONVERSATION_STARTERS } from '@/lib/constants'
 
@@ -31,6 +31,9 @@ export default function ConversationScreen({ config, onBack }: Props) {
   const [isMobile, setIsMobile] = useState(false)
   const [waitingForTap, setWaitingForTap] = useState(false)
   const [voicePrefs, setVoicePrefs] = useState<VoicePreferences>({ accent: 'indian', gender: 'female' })
+  const [wpm, setWpm] = useState(0)
+  const sessionStartRef = useRef<number | null>(null)
+  const totalUserWordsRef = useRef(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -134,6 +137,37 @@ export default function ConversationScreen({ config, onBack }: Props) {
     if (messages.length > 1) resetInactivityTimer(sendMessage)
   }, [messages, resetInactivityTimer, sendMessage])
 
+  // WPM tracking — update whenever a user message is added
+  useEffect(() => {
+    const userMsgs = messages.filter(m => m.role === 'user' && m.content && !m.content.startsWith('[SYSTEM'))
+    if (userMsgs.length === 0) return
+    if (!sessionStartRef.current) sessionStartRef.current = Date.now()
+    totalUserWordsRef.current = userMsgs.reduce((acc, m) => acc + m.content.trim().split(/\s+/).length, 0)
+    const elapsedMin = (Date.now() - sessionStartRef.current) / 60000
+    if (elapsedMin > 0) setWpm(Math.round(totalUserWordsRef.current / elapsedMin))
+  }, [messages])
+
+  // Save conversation when session ends
+  useEffect(() => {
+    if (isSessionEnded && messages.length > 0) {
+      const userMsgs = messages.filter(m => m.role === 'user' && m.content && !m.content.startsWith('[SYSTEM'))
+      const duration = sessionStartRef.current ? (Date.now() - sessionStartRef.current) / 1000 : 0
+      saveConversation({
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        title: config.title,
+        mode: config.mode,
+        messages: messages
+          .filter(m => m.content && !m.content.startsWith('[SYSTEM'))
+          .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+        score: sessionScore,
+        duration,
+        wordCount: totalUserWordsRef.current,
+        wpm,
+      })
+    }
+  }, [isSessionEnded]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSend = () => {
     const text = input.trim()
     if (!text || isLoading) return
@@ -228,6 +262,16 @@ export default function ConversationScreen({ config, onBack }: Props) {
             <span className={`font-black ${scoreColor(s.value)}`}>{s.value}</span>
           </div>
         ))}
+        {wpm > 0 && (
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border whitespace-nowrap ${
+            wpm >= 120 ? 'bg-emerald-500/15 border-emerald-500/30' :
+            wpm >= 80  ? 'bg-blue-500/15 border-blue-500/30' :
+                         'bg-yellow-500/15 border-yellow-500/30'
+          }`}>
+            <span className="text-slate-400">Speed</span>
+            <span className={`font-black ${wpm >= 120 ? 'text-emerald-400' : wpm >= 80 ? 'text-blue-400' : 'text-yellow-400'}`}>{wpm} wpm</span>
+          </div>
+        )}
       </div>
 
       {/* Messages */}

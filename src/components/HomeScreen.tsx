@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import {
   MessageCircle, Mic, Trophy, BookOpen, Settings,
   Zap, Target, Star, ChevronRight, Play, Users,
-  Briefcase, Flame, TrendingUp, Globe
+  Briefcase, Flame, TrendingUp, Globe, History
 } from 'lucide-react'
 import { Screen, ConversationConfig } from '@/app/page'
 import { ROLEPLAY_SCENARIOS, INTERVIEW_MODES, DAILY_MISSIONS, CONVERSATION_STARTERS } from '@/lib/constants'
@@ -165,7 +165,9 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
                   { emoji: '⚽', topic: 'Sports', color: 'from-green-900/40 to-green-800/20', border: 'border-green-700/30', prompt: 'sports, fitness, and competitions' },
                   { emoji: '💻', topic: 'Technology', color: 'from-violet-900/40 to-violet-800/20', border: 'border-violet-700/30', prompt: 'technology, AI, gadgets, and innovation' },
                   { emoji: '🍕', topic: 'Food & Cooking', color: 'from-orange-900/40 to-orange-800/20', border: 'border-orange-700/30', prompt: 'food, cooking, restaurants, and cuisine' },
-                  { emoji: '📚', topic: 'Education', color: 'from-teal-900/40 to-teal-800/20', border: 'border-teal-700/30', prompt: 'education, learning, and personal development' },
+                  { emoji: '📚', topic: 'Education',    color: 'from-teal-900/40 to-teal-800/20',   border: 'border-teal-700/30',   prompt: 'education, learning, and personal development' },
+                  { emoji: '🛍️', topic: 'Shopping',    color: 'from-rose-900/40 to-rose-800/20',   border: 'border-rose-700/30',   prompt: 'shopping, stores, fashion, and buying things' },
+                  { emoji: '🍽️', topic: 'Restaurant',  color: 'from-amber-900/40 to-amber-800/20', border: 'border-amber-700/30',  prompt: 'restaurants, ordering food, menus, and dining out' },
                 ].map(item => (
                   <button
                     key={item.topic}
@@ -292,6 +294,7 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
         {[
           { icon: MessageCircle, label: 'Home',       screen: 'home'       as Screen, active: true },
           { icon: TrendingUp,    label: 'Progress',   screen: 'dashboard'  as Screen, active: false },
+          { icon: History,       label: 'History',    screen: 'history'    as Screen, active: false },
           { icon: BookOpen,      label: 'Vocabulary', screen: 'vocabulary' as Screen, active: false },
           { icon: Settings,      label: 'Settings',   screen: 'settings'   as Screen, active: false },
         ].map(item => (
