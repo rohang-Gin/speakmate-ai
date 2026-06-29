@@ -5,9 +5,9 @@ import { AIResponse } from '@/types'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { messages, mode, level, roleplayContext, interviewContext } = body
+    const { messages, mode, level, roleplayContext, interviewContext, systemPrompt: customSystemPrompt } = body
 
-    const systemPrompt = buildSystemPrompt(mode, level, roleplayContext, interviewContext)
+    const systemPrompt = customSystemPrompt || buildSystemPrompt(mode, level, roleplayContext, interviewContext)
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',

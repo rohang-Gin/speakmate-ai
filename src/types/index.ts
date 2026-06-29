@@ -106,4 +106,6 @@ export interface AIResponse {
   sessionScore?: SessionScore
   isSessionEnd?: boolean
   homework?: string[]
+  targetSentence?: string | null
+  isCorrect?: boolean | null
 }
