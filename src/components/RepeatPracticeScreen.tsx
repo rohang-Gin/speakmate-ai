@@ -44,6 +44,7 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
   const [status, setStatus]         = useState<Status>('loading')
   const [score, setScore]           = useState(0)
   const [waitingTap, setWaitingTap] = useState(false)
+  const [debugLogs, setDebugLogs]   = useState<string[]>([])
   const sentenceIdRef  = useRef(0)
   const messagesRef    = useRef<TurnMessage[]>([])
   const voicePrefs     = useRef(getVoicePreferences())
@@ -52,6 +53,13 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
   const activeTarget   = useRef<string | null>(null)
 
   const { speak, stopSpeaking, startListening, stopListening, supported } = useSpeech()
+
+  const log = (msg: string) => {
+    const ts = new Date().toLocaleTimeString('en-IN', { hour12: false })
+    const line = `[${ts}] ${msg}`
+    console.log(line)
+    setDebugLogs(prev => [...prev.slice(-19), line])
+  }
 
   const scrollToBottom = () =>
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
@@ -62,18 +70,21 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
     const fullText = `${preamble} ${sentence}`
     speak(fullText, 0.85, voicePrefs.current.accent, voicePrefs.current.gender)
     const ms = (fullText.split(' ').length / 2.5) * 1000 + 800
+    log(`speakThenShow: will show mic in ${ms}ms`)
     setTimeout(() => {
       setStatus('showing')
       if (mobile.current) setWaitingTap(true)
     }, ms)
-  }, [speak])
+  }, [speak]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Fetch next sentence from AI ─────────────────────────────────────
   const fetchSentence = useCallback(async (prevMsg?: string) => {
     setStatus('loading')
+    log(`fetchSentence called. prevMsg=${prevMsg ?? 'none'}`)
     if (prevMsg) messagesRef.current.push({ role: 'user', content: prevMsg })
 
     try {
+      log('Calling /api/chat ...')
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,36 +96,52 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         }),
       })
 
+      log(`API response status: ${res.status}`)
       const data = await res.json()
+      log(`Raw data keys: ${Object.keys(data).join(', ')}`)
+      log(`data.content type: ${typeof data.content} | data.message type: ${typeof data.message}`)
+
       let parsed: { message: string; targetSentence?: string | null }
-      try { parsed = typeof data.content === 'string' ? JSON.parse(data.content) : data }
-      catch { parsed = { message: data.content || data.message || '' } }
+      try {
+        parsed = typeof data.content === 'string' ? JSON.parse(data.content) : data
+        log(`Parsed OK. message="${parsed.message?.slice(0,60)}" targetSentence="${parsed.targetSentence}"`)
+      } catch (e) {
+        log(`JSON parse failed: ${e}. Fallback to raw.`)
+        parsed = { message: data.content || data.message || '' }
+      }
 
       messagesRef.current.push({ role: 'assistant', content: parsed.message })
 
       // Extract target sentence
       let target = parsed.targetSentence
+      log(`targetSentence from parsed: "${target}"`)
       if (!target) {
         const match = parsed.message.match(/Repeat after me[:\s]+[""]?([^"""]+?)[""]?[.!]?\s*$/i)
         target = match?.[1]?.trim() ?? null
+        log(`Regex extract: "${target}"`)
       }
 
       if (target) {
+        log(`Got target sentence: "${target}" — adding to list`)
         sentenceIdRef.current += 1
         activeTarget.current = target
         setSentences(prev => [...prev, {
           id: sentenceIdRef.current,
-          target,
+          target: target!,
           attempts: [],
           done: false,
         }])
         scrollToBottom()
         speakThenShow(target)
+      } else {
+        log(`ERROR: No target sentence found! message was: "${parsed.message?.slice(0, 100)}"`)
+        setStatus('showing')
       }
-    } catch {
+    } catch (e) {
+      log(`FETCH ERROR: ${e}`)
       setStatus('showing')
     }
-  }, [tense, speakThenShow])
+  }, [tense, speakThenShow]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Evaluate user's attempt ─────────────────────────────────────────
   const evaluate = useCallback((finalText: string) => {
@@ -294,6 +321,16 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         )}
 
         <div ref={bottomRef} />
+
+        {/* DEBUG PANEL */}
+        <div className="mt-4 rounded-2xl p-3" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,0,0.2)' }}>
+          <p className="text-yellow-400 text-xs font-bold mb-2">🐛 Debug Log</p>
+          {debugLogs.length === 0
+            ? <p className="text-slate-600 text-xs">No logs yet...</p>
+            : debugLogs.map((l, i) => (
+              <p key={i} className="text-green-400 text-xs font-mono leading-5 break-all">{l}</p>
+            ))}
+        </div>
       </div>
 
       {/* Bottom controls */}
