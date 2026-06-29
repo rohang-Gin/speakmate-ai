@@ -13,6 +13,7 @@ import { ConversationConfig } from '@/app/page'
 import { useConversation } from '@/hooks/useConversation'
 import { useSpeech } from '@/hooks/useSpeech'
 import { Message, SessionReport } from '@/types'
+import { getVoicePreferences, VoicePreferences } from '@/lib/storage'
 import SessionReportCard from './SessionReportCard'
 import { CONVERSATION_STARTERS } from '@/lib/constants'
 
@@ -30,6 +31,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
   const [isMobile, setIsMobile] = useState(false)
   const [waitingForTap, setWaitingForTap] = useState(false)
   const [debugLog, setDebugLog] = useState<string[]>([])
+  const [voicePrefs, setVoicePrefs] = useState<VoicePreferences>({ accent: 'indian', gender: 'female' })
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -47,7 +49,10 @@ export default function ConversationScreen({ config, onBack }: Props) {
 
   const { isListening, transcript, startListening, stopListening, speak, stopSpeaking, supported, lastError } = useSpeech()
 
-  useEffect(() => { setIsMobile(checkIsMobile()) }, [])
+  useEffect(() => {
+    setIsMobile(checkIsMobile())
+    setVoicePrefs(getVoicePreferences())
+  }, [])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -129,7 +134,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
 
       if (autoSpeak) {
         setAiSpeaking(true)
-        speak(last.content)
+        speak(last.content, 0.92, voicePrefs.accent, voicePrefs.gender)
         setTimeout(afterAiSpeaks, estimatedMs)
       } else {
         afterAiSpeaks()
@@ -251,7 +256,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
         )}
 
         {messages.filter(m => m.content && !m.content.startsWith('[SYSTEM')).map(msg => (
-          <MessageBubble key={msg.id} message={msg} onReplay={(text) => { stopSpeaking(); speak(text) }} />
+          <MessageBubble key={msg.id} message={msg} onReplay={(text) => { stopSpeaking(); speak(text, 0.92, voicePrefs.accent, voicePrefs.gender) }} />
         ))}
 
         {isLoading && (

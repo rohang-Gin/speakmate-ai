@@ -6,7 +6,7 @@ interface UseSpeechReturn {
   transcript: string
   startListening: (onFinal?: (text: string) => void) => void
   stopListening: () => void
-  speak: (text: string, rate?: number) => void
+  speak: (text: string, rate?: number, accent?: 'indian' | 'default', gender?: 'male' | 'female') => void
   stopSpeaking: () => void
   isSpeaking: boolean
   supported: boolean
@@ -203,7 +203,7 @@ export function useSpeech(): UseSpeechReturn {
     accumulatedRef.current = ''
   }, [])
 
-  const speak = useCallback((text: string, rate = 0.92) => {
+  const speak = useCallback((text: string, rate = 0.92, accent: 'indian' | 'default' = 'indian', gender: 'male' | 'female' = 'female') => {
     if (!synthRef.current) return
     synthRef.current.cancel()
 
@@ -214,19 +214,50 @@ export function useSpeech(): UseSpeechReturn {
       .replace(/`/g, '')
 
     const utterance = new SpeechSynthesisUtterance(cleanText)
-    utterance.lang = 'en-US'
     utterance.rate = rate
-    utterance.pitch = 1
     utterance.volume = 1
 
     const voices = synthRef.current.getVoices()
-    const preferred =
-      voices.find(v => v.lang === 'en-US' && v.name.includes('Google US English')) ||
-      voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
-      voices.find(v => v.lang === 'en-US' && !v.localService) ||
-      voices.find(v => v.lang.startsWith('en'))
+    const isFemale = gender === 'female'
+    const isIndian = accent === 'indian'
 
-    if (preferred) utterance.voice = preferred
+    const femaleKeywords = ['female', 'woman', 'girl', 'zira', 'samantha', 'karen', 'victoria', 'moira', 'veena', 'raveena']
+    const maleKeywords   = ['male', 'man', 'david', 'mark', 'daniel', 'alex', 'tom', 'fred', 'george', 'rishi']
+
+    const matchesGender = (v: SpeechSynthesisVoice) => {
+      const n = v.name.toLowerCase()
+      return isFemale ? femaleKeywords.some(k => n.includes(k)) : maleKeywords.some(k => n.includes(k))
+    }
+
+    let preferred: SpeechSynthesisVoice | undefined
+
+    if (isIndian) {
+      // Try Indian English with correct gender
+      preferred = voices.find(v => v.lang === 'en-IN' && matchesGender(v))
+      // Any Indian English voice
+      if (!preferred) preferred = voices.find(v => v.lang === 'en-IN')
+      // Indian Hindi voice as fallback
+      if (!preferred) preferred = voices.find(v => v.lang === 'hi-IN')
+    }
+
+    if (!preferred) {
+      // en-US with gender match
+      preferred = voices.find(v => v.lang === 'en-US' && matchesGender(v))
+      // Any en-US voice
+      if (!preferred) preferred = voices.find(v => v.lang === 'en-US' && !v.localService)
+      if (!preferred) preferred = voices.find(v => v.lang.startsWith('en') && matchesGender(v))
+      if (!preferred) preferred = voices.find(v => v.lang.startsWith('en'))
+    }
+
+    if (preferred) {
+      utterance.voice = preferred
+      utterance.lang = preferred.lang
+    } else {
+      utterance.lang = isIndian ? 'en-IN' : 'en-US'
+    }
+
+    // Pitch as gender fallback when no named gender voice found
+    utterance.pitch = isFemale ? 1.2 : 0.85
 
     utterance.onstart = () => setIsSpeaking(true)
     utterance.onend = () => setIsSpeaking(false)

@@ -3,6 +3,28 @@ import { UserProgress, SessionReport, VocabEntry, DifficultyLevel } from '@/type
 const KEYS = {
   PROGRESS: 'speakmate_progress',
   CURRENT_LEVEL: 'speakmate_level',
+  VOICE_PREFS: 'speakmate_voice_prefs',
+}
+
+export interface VoicePreferences {
+  accent: 'indian' | 'default'
+  gender: 'male' | 'female'
+}
+
+export function getVoicePreferences(): VoicePreferences {
+  if (typeof window === 'undefined') return { accent: 'indian', gender: 'female' }
+  try {
+    const raw = localStorage.getItem(KEYS.VOICE_PREFS)
+    if (!raw) return { accent: 'indian', gender: 'female' }
+    return JSON.parse(raw) as VoicePreferences
+  } catch {
+    return { accent: 'indian', gender: 'female' }
+  }
+}
+
+export function saveVoicePreferences(prefs: VoicePreferences): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(KEYS.VOICE_PREFS, JSON.stringify(prefs))
 }
 
 export function getDefaultProgress(): UserProgress {
