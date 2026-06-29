@@ -6,6 +6,7 @@ import DashboardScreen from '@/components/DashboardScreen'
 import VocabularyScreen from '@/components/VocabularyScreen'
 import SettingsScreen from '@/components/SettingsScreen'
 import HistoryScreen from '@/components/HistoryScreen'
+import RepeatPracticeScreen from '@/components/RepeatPracticeScreen'
 import { ConversationMode, RoleplayScenario, InterviewMode } from '@/types'
 
 export type Screen =
@@ -15,6 +16,7 @@ export type Screen =
   | 'vocabulary'
   | 'settings'
   | 'history'
+  | 'repeat-practice'
 
 export interface ConversationConfig {
   mode: ConversationMode
@@ -27,10 +29,16 @@ export interface ConversationConfig {
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [convConfig, setConvConfig] = useState<ConversationConfig | null>(null)
+  const [repeatTense, setRepeatTense] = useState<string>('')
 
   const startConversation = (config: ConversationConfig) => {
     setConvConfig(config)
     setScreen('conversation')
+  }
+
+  const startRepeat = (tense: string) => {
+    setRepeatTense(tense)
+    setScreen('repeat-practice')
   }
 
   const goHome = () => {
@@ -53,10 +61,13 @@ export default function App() {
         <VocabularyScreen onBack={() => setScreen('home')} />
       )}
       {screen === 'settings' && (
-        <SettingsScreen onBack={() => setScreen('home')} />
+        <SettingsScreen onBack={() => setScreen('home')} onStartRepeat={startRepeat} />
       )}
       {screen === 'history' && (
         <HistoryScreen onBack={() => setScreen('home')} />
+      )}
+      {screen === 'repeat-practice' && (
+        <RepeatPracticeScreen tense={repeatTense} onBack={() => setScreen('settings')} />
       )}
     </main>
   )

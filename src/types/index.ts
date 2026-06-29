@@ -8,6 +8,7 @@ export type ConversationMode =
   | 'interview'
   | 'daily-mission'
   | 'scenario'
+  | 'repeat-practice'
 
 export interface GrammarCorrection {
   original: string

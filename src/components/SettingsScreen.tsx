@@ -1,12 +1,26 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Brain, Volume2, Trash2, ChevronRight, Sparkles } from 'lucide-react'
+import { ArrowLeft, Brain, Volume2, Trash2, Sparkles, BookOpenCheck, ChevronRight } from 'lucide-react'
 import { getUserLevel, updateUserLevel, saveProgress, getDefaultProgress, getVoicePreferences, saveVoicePreferences, VoicePreferences } from '@/lib/storage'
 import { DifficultyLevel } from '@/types'
 
-interface Props { onBack: () => void }
+interface Props {
+  onBack: () => void
+  onStartRepeat?: (tense: string) => void
+}
 
-export default function SettingsScreen({ onBack }: Props) {
+const TENSES = [
+  { id: 'Present Simple',       emoji: '🟢', desc: 'I eat, She goes, They play' },
+  { id: 'Present Continuous',   emoji: '🔵', desc: 'I am eating, She is going' },
+  { id: 'Past Simple',          emoji: '🟠', desc: 'I ate, She went, They played' },
+  { id: 'Past Continuous',      emoji: '🔴', desc: 'I was eating, She was going' },
+  { id: 'Future Simple',        emoji: '🟣', desc: 'I will eat, She will go' },
+  { id: 'Present Perfect',      emoji: '⭐', desc: 'I have eaten, She has gone' },
+  { id: 'Future Continuous',    emoji: '💜', desc: 'I will be eating, She will be going' },
+  { id: 'Past Perfect',         emoji: '🟤', desc: 'I had eaten, She had gone' },
+]
+
+export default function SettingsScreen({ onBack, onStartRepeat }: Props) {
   const [level, setLevel] = useState<DifficultyLevel>('beginner')
   const [voicePrefs, setVoicePrefs] = useState<VoicePreferences>({ accent: 'indian', gender: 'female' })
   const [cleared, setCleared] = useState(false)
@@ -162,6 +176,33 @@ export default function SettingsScreen({ onBack }: Props) {
                 <span className="text-slate-500 text-sm">{row.label}</span>
                 <span className="text-slate-300 text-sm font-medium">{row.value}</span>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Repeat & Learn */}
+        <div className="rounded-3xl p-5"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <BookOpenCheck size={17} className="text-emerald-400" />
+            <h3 className="text-white font-bold">Repeat &amp; Learn</h3>
+          </div>
+          <p className="text-slate-500 text-xs mb-4">AI speaks a sentence → you repeat it → AI checks. Learn grammar tense by tense.</p>
+          <div className="space-y-2">
+            {TENSES.map(t => (
+              <button key={t.id} onClick={() => onStartRepeat?.(t.id)}
+                className="w-full flex items-center gap-3 p-3.5 rounded-2xl text-left transition-all hover:bg-white/05 active:scale-[0.99]"
+                style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <span className="text-xl">{t.emoji}</span>
+                <div className="flex-1">
+                  <p className="text-white font-semibold text-sm">{t.id}</p>
+                  <p className="text-slate-500 text-xs mt-0.5">{t.desc}</p>
+                </div>
+                <div className="px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-400"
+                  style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
+                  Practice
+                </div>
+              </button>
             ))}
           </div>
         </div>
