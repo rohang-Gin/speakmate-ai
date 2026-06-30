@@ -5,11 +5,11 @@ import { AIResponse } from '@/types'
 // Collect all configured API keys in order
 function getApiKeys(): string[] {
   const keys = [
-    process.env.GROQ_API_KEY,
     process.env.GROQ_API_KEY_2,
     process.env.GROQ_API_KEY_3,
     process.env.GROQ_API_KEY_4,
     process.env.GROQ_API_KEY_5,
+    process.env.GROQ_API_KEY,   // old key last
   ].filter((k): k is string => !!k)
 
   // Deduplicate
