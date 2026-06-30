@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errText = await response.text()
       console.error('Groq API error:', response.status, errText)
+      if (response.status === 429) {
+        return NextResponse.json({ error: 'rate_limit' }, { status: 429 })
+      }
       return NextResponse.json({ error: `Groq error: ${response.status}` }, { status: 500 })
     }
 

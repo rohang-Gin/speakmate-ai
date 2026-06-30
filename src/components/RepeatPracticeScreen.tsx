@@ -79,9 +79,9 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
   }, [speak]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Fetch next sentence from AI ─────────────────────────────────────
-  const fetchSentence = useCallback(async (prevMsg?: string) => {
+  const fetchSentence = useCallback(async (prevMsg?: string, retryCount = 0) => {
     setStatus('loading')
-    log(`fetchSentence called. prevMsg=${prevMsg ?? 'none'}`)
+    log(`fetchSentence called. prevMsg=${prevMsg ?? 'none'} retry=${retryCount}`)
     if (prevMsg) messagesRef.current.push({ role: 'user', content: prevMsg })
 
     try {
@@ -102,8 +102,17 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
       log(`Raw data keys: ${Object.keys(data).join(', ')}`)
 
       if (!res.ok) {
-        log(`API ERROR 500: ${data.error || JSON.stringify(data)}`)
-        setStatus('showing')
+        log(`API ERROR ${res.status}: ${data.error || JSON.stringify(data)}`)
+        if (res.status === 429 && retryCount < 2) {
+          const waitSec = (retryCount + 1) * 10
+          log(`Rate limited — retry ${retryCount + 1}/2 in ${waitSec}s`)
+          // undo the message push so it doesn't duplicate on retry
+          if (prevMsg) messagesRef.current.pop()
+          setTimeout(() => fetchSentence(prevMsg, retryCount + 1), waitSec * 1000)
+        } else {
+          log('Rate limit max retries reached — giving up')
+          setStatus('showing')
+        }
         return
       }
 
