@@ -32,10 +32,19 @@ export default function ConversationScreen({ config, onBack }: Props) {
   const [waitingForTap, setWaitingForTap] = useState(false)
   const [voicePrefs, setVoicePrefs] = useState<VoicePreferences>({ accent: 'indian', gender: 'female' })
   const [wpm, setWpm] = useState(0)
+  const [debugLogs, setDebugLogs] = useState<string[]>([])
+  const [showDebug, setShowDebug] = useState(false)
   const sessionStartRef = useRef<number | null>(null)
   const totalUserWordsRef = useRef(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const log = (msg: string) => {
+    const ts = new Date().toLocaleTimeString('en-IN', { hour12: false })
+    const line = `[${ts}] ${msg}`
+    console.log(line)
+    setDebugLogs(prev => [...prev.slice(-19), line])
+  }
 
   const { messages, isLoading, sessionScore, isSessionEnded, sendMessage, clearSession, resetInactivityTimer } =
     useConversation({
@@ -77,13 +86,15 @@ export default function ConversationScreen({ config, onBack }: Props) {
   }, [hasStarted, messages.length, config, sendMessage])
 
   const doStartListening = useCallback(() => {
+    log('Mic started (tap button)')
     startListening((finalText) => {
+      log(`Mic final text: "${finalText}"`)
       setWaitingForTap(false)
       stopSpeaking()
       sendMessage(finalText)
       setInput('')
     })
-  }, [startListening, stopSpeaking, sendMessage])
+  }, [startListening, stopSpeaking, sendMessage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // On mobile: if mic stops without sending, bring the tap button back
   useEffect(() => {
@@ -108,12 +119,15 @@ export default function ConversationScreen({ config, onBack }: Props) {
       const afterAiSpeaks = () => {
         setTimeout(() => {
           setAiSpeaking(false)
+          log(`AI finished speaking. isListening=${isListening} isMobile=${isMobile}`)
           if (!isListening) {
             if (isMobile) {
-              // Mobile: can't auto-start mic — needs a user tap
+              log('Mobile: showing tap button')
               setWaitingForTap(true)
             } else {
+              log('Desktop: auto-starting mic')
               startListening((finalText) => {
+                log(`Mic final text (auto): "${finalText}"`)
                 stopSpeaking()
                 sendMessage(finalText)
                 setInput('')
@@ -124,6 +138,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
       }
 
       if (autoSpeak) {
+        log(`AI message received (${wordCount} words). Speaking for ~${Math.round(estimatedMs/1000)}s`)
         setAiSpeaking(true)
         speak(last.content, 0.92, voicePrefs.accent, voicePrefs.gender)
         setTimeout(afterAiSpeaks, estimatedMs)
@@ -306,6 +321,25 @@ export default function ConversationScreen({ config, onBack }: Props) {
           </div>
         )}
         <div ref={messagesEndRef} />
+
+        {/* DEBUG PANEL */}
+        <div className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,0,0.2)' }}>
+          <button onClick={() => setShowDebug(v => !v)}
+            className="w-full flex items-center justify-between px-3 py-2"
+            style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <span className="text-yellow-400 text-xs font-bold">🐛 Debug Log {debugLogs.length > 0 && `(${debugLogs.length})`}</span>
+            <span className="text-yellow-600 text-xs">{showDebug ? '▲ Hide' : '▼ Show'}</span>
+          </button>
+          {showDebug && (
+            <div className="px-3 pb-3 pt-1" style={{ background: 'rgba(0,0,0,0.6)' }}>
+              {debugLogs.length === 0
+                ? <p className="text-slate-600 text-xs">No logs yet...</p>
+                : debugLogs.map((l, i) => (
+                  <p key={i} className="text-green-400 text-xs font-mono leading-5 break-all">{l}</p>
+                ))}
+            </div>
+          )}
+        </div>
       </div>
 
 

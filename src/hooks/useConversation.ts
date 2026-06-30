@@ -37,7 +37,12 @@ export function useConversation({
   }, [])
 
   const sendMessage = useCallback(async (userText: string) => {
-    if (!userText.trim() || isLoading || isSessionEnded) return
+    const ts = new Date().toLocaleTimeString('en-IN', { hour12: false })
+    console.log(`[${ts}] sendMessage called: "${userText.slice(0,60)}" | isLoading=${isLoading} isSessionEnded=${isSessionEnded}`)
+    if (!userText.trim() || isLoading || isSessionEnded) {
+      console.log(`[${ts}] sendMessage BLOCKED: empty=${!userText.trim()} loading=${isLoading} ended=${isSessionEnded}`)
+      return
+    }
 
     const isInactivity = userText === '__inactivity__'
     const isSystem = userText.startsWith('[SYSTEM:')
@@ -73,6 +78,9 @@ export function useConversation({
         })
       }
 
+      const ts2 = new Date().toLocaleTimeString('en-IN', { hour12: false })
+      console.log(`[${ts2}] Calling /api/chat — mode=${mode} level=${level} historyLen=${historyForApi.length}`)
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,6 +94,8 @@ export function useConversation({
       })
 
       const data: AIResponse & { error?: string } = await res.json()
+      const ts3 = new Date().toLocaleTimeString('en-IN', { hour12: false })
+      console.log(`[${ts3}] API response status=${res.status} error=${data.error} message="${data.message?.slice(0,60)}"`)
 
       if (!res.ok || data.error) {
         throw new Error(data.error || `API error ${res.status}`)
