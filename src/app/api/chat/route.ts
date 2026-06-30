@@ -35,12 +35,17 @@ export async function POST(req: NextRequest) {
     })
 
     const keys = getApiKeys()
+    console.log(`[chat] Total keys available: ${keys.length}`)
     if (keys.length === 0) {
+      console.error('[chat] ERROR: No API key configured in environment variables')
       return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
     }
 
     let lastStatus = 500
     for (let i = 0; i < keys.length; i++) {
+      const keyPreview = keys[i].slice(0, 8) + '...' + keys[i].slice(-4)
+      console.log(`[chat] Trying key ${i + 1}/${keys.length}: ${keyPreview}`)
+
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -51,16 +56,18 @@ export async function POST(req: NextRequest) {
       })
 
       lastStatus = response.status
+      console.log(`[chat] Key ${i + 1} response status: ${response.status}`)
 
       if (response.status === 429) {
-        console.warn(`Key ${i + 1}/${keys.length} rate limited — trying next`)
+        const errBody = await response.text()
+        console.warn(`[chat] Key ${i + 1} rate limited (429). Body: ${errBody.slice(0, 200)}`)
         continue  // try next key
       }
 
       if (!response.ok) {
         const errText = await response.text()
-        console.error(`Groq API error on key ${i + 1}:`, response.status, errText)
-        return NextResponse.json({ error: `Groq error: ${response.status}` }, { status: 500 })
+        console.error(`[chat] Key ${i + 1} error ${response.status}: ${errText.slice(0, 300)}`)
+        return NextResponse.json({ error: `Groq error: ${response.status}`, detail: errText.slice(0, 200) }, { status: 500 })
       }
 
       // Success
