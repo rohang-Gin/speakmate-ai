@@ -48,8 +48,8 @@ export default function SettingsScreen({ onBack, onStartRepeat }: Props) {
 
   const levels: { id: DifficultyLevel; label: string; desc: string; emoji: string; color: string; bg: string; border: string }[] = [
     { id: 'beginner',     label: 'Beginner',     emoji: '🌱', desc: 'Simple words, like talking to a child',  color: '#22c55e', bg: 'rgba(34,197,94,0.1)',   border: 'rgba(34,197,94,0.3)'   },
-    { id: 'intermediate', label: 'Intermediate', emoji: '📈', desc: 'Daily life & workplace communication',   color: '#6366f1', bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.3)' },
-    { id: 'advanced',     label: 'Advanced',     emoji: '🚀', desc: 'Complex topics & idiomatic English',     color: '#a855f7', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.3)' },
+    { id: 'intermediate', label: 'Intermediate', emoji: '📈', desc: 'Daily life & workplace communication',   color: '#1a5c3a', bg: 'rgba(26,92,58,0.1)', border: 'rgba(26,92,58,0.3)' },
+    { id: 'advanced',     label: 'Advanced',     emoji: '🚀', desc: 'Complex topics & idiomatic English',     color: '#3d9e6b', bg: 'rgba(61,158,107,0.1)', border: 'rgba(61,158,107,0.3)' },
   ]
 
   const OptionBtn = ({
@@ -59,11 +59,11 @@ export default function SettingsScreen({ onBack, onStartRepeat }: Props) {
       onClick={onClick}
       className="flex-1 flex flex-col items-center gap-1 py-3 px-2 rounded-2xl transition-all"
       style={{
-        background: active ? 'rgba(99,102,241,0.15)' : 'rgba(0,0,0,0.2)',
-        border: `1px solid ${active ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.05)'}`,
+        background: active ? 'rgba(26,92,58,0.15)' : 'rgba(0,0,0,0.2)',
+        border: `1px solid ${active ? 'rgba(26,92,58,0.5)' : 'rgba(255,255,255,0.05)'}`,
       }}>
       <span className="text-sm font-bold" style={{ color: active ? '#a5b4fc' : '#94a3b8' }}>{label}</span>
-      {sub && <span className="text-xs" style={{ color: active ? '#6366f1' : '#475569' }}>{sub}</span>}
+      {sub && <span className="text-xs" style={{ color: active ? '#1a5c3a' : '#475569' }}>{sub}</span>}
     </button>
   )
 
@@ -83,7 +83,7 @@ export default function SettingsScreen({ onBack, onStartRepeat }: Props) {
         <div className="rounded-3xl p-5"
           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Brain size={17} className="text-purple-400" />
+            <Brain size={17} className="text-[#3d9e6b]" />
             <h3 className="text-white font-bold">My English Level</h3>
           </div>
           <div className="space-y-2.5">

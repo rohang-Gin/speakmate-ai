@@ -40,7 +40,7 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
 
       {/* Background orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#1a5c3a]/10 blur-3xl" />
         <div className="absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-purple-600/08 blur-3xl" />
       </div>
 
@@ -56,7 +56,7 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
         </div>
         <div className="flex gap-2">
           <button onClick={() => onNavigate('dashboard')}
-            className="p-2.5 rounded-2xl glass-light hover:bg-white/08 text-slate-400 hover:text-indigo-400 transition-all">
+            className="p-2.5 rounded-2xl glass-light hover:bg-white/08 text-slate-400 hover:text-[#3d9e6b] transition-all">
             <Trophy size={19} />
           </button>
           <button onClick={() => onNavigate('settings')}
@@ -78,17 +78,17 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
           </div>
           <div className="card-gradient-blue rounded-2xl p-3.5 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <MessageCircle size={16} className="text-indigo-400" />
-              <span className="text-2xl font-black text-indigo-300">{progress.totalSessions}</span>
+              <MessageCircle size={16} className="text-[#3d9e6b]" />
+              <span className="text-2xl font-black text-[#4db87e]">{progress.totalSessions}</span>
             </div>
-            <p className="text-indigo-400/70 text-xs font-medium">Sessions</p>
+            <p className="text-[#3d9e6b]/70 text-xs font-medium">Sessions</p>
           </div>
           <div className="card-gradient-purple rounded-2xl p-3.5 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Zap size={16} className="text-purple-400" />
-              <span className="text-2xl font-black text-purple-300">{progress.xpPoints}</span>
+              <Zap size={16} className="text-[#3d9e6b]" />
+              <span className="text-2xl font-black text-[#4db87e]">{progress.xpPoints}</span>
             </div>
-            <p className="text-purple-400/70 text-xs font-medium">XP Points</p>
+            <p className="text-[#3d9e6b]/70 text-xs font-medium">XP Points</p>
           </div>
         </div>
       )}
@@ -118,24 +118,24 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
           <>
             {/* Hero Card */}
             <div className="relative rounded-3xl overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #2e1065 50%, #1e1b4b 100%)', border: '1px solid rgba(99,102,241,0.4)' }}>
+              style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #2e1065 50%, #1e1b4b 100%)', border: '1px solid rgba(26,92,58,0.4)' }}>
               <div className="absolute inset-0 shimmer pointer-events-none" />
               <div className="relative p-6">
                 <div className="flex items-start gap-4 mb-5">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 float"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 8px 24px rgba(99,102,241,0.5)' }}>
+                    style={{ background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)', boxShadow: '0 8px 24px rgba(26,92,58,0.5)' }}>
                     <Mic size={26} className="text-white" />
                   </div>
                   <div>
                     <h2 className="text-white font-black text-xl leading-tight">Talk to Your<br />AI English Coach</h2>
-                    <p className="text-indigo-300/70 text-sm mt-1">Available 24/7 · Always patient</p>
+                    <p className="text-[#4db87e]/70 text-sm mt-1">Available 24/7 · Always patient</p>
                   </div>
                 </div>
 
                 {/* Starter quote */}
                 <div className="rounded-2xl p-4 mb-5"
                   style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <p className="text-xs text-indigo-300/60 font-semibold uppercase tracking-wider mb-2">Your coach will ask:</p>
+                  <p className="text-xs text-[#4db87e]/60 font-semibold uppercase tracking-wider mb-2">Your coach will ask:</p>
                   <p className="text-slate-200 text-sm leading-relaxed italic">
                     "{CONVERSATION_STARTERS[starterIndex]}"
                   </p>
@@ -163,7 +163,7 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
                   { emoji: '💼', topic: 'Work & Career', color: 'from-indigo-900/40 to-indigo-800/20', border: 'border-indigo-700/30', prompt: 'work, career growth, and professional life' },
                   { emoji: '🎬', topic: 'Movies & Shows', color: 'from-pink-900/40 to-pink-800/20', border: 'border-pink-700/30', prompt: 'movies, TV shows, and entertainment' },
                   { emoji: '⚽', topic: 'Sports', color: 'from-green-900/40 to-green-800/20', border: 'border-green-700/30', prompt: 'sports, fitness, and competitions' },
-                  { emoji: '💻', topic: 'Technology', color: 'from-violet-900/40 to-violet-800/20', border: 'border-violet-700/30', prompt: 'technology, AI, gadgets, and innovation' },
+                  { emoji: '💻', topic: 'Technology', color: 'from-[#0d2e1d]/40 to-[#1a5c3a]/20', border: 'border-[#2d7d54]/30', prompt: 'technology, AI, gadgets, and innovation' },
                   { emoji: '🍕', topic: 'Food & Cooking', color: 'from-orange-900/40 to-orange-800/20', border: 'border-orange-700/30', prompt: 'food, cooking, restaurants, and cuisine' },
                   { emoji: '📚', topic: 'Education',    color: 'from-teal-900/40 to-teal-800/20',   border: 'border-teal-700/30',   prompt: 'education, learning, and personal development' },
                   { emoji: '🛍️', topic: 'Shopping',    color: 'from-rose-900/40 to-rose-800/20',   border: 'border-rose-700/30',   prompt: 'shopping, stores, fashion, and buying things' },
@@ -194,9 +194,9 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
         {/* Roleplay */}
         {activeTab === 'roleplay' && (
           <div className="space-y-3">
-            <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(99,102,241,0.1))', border: '1px solid rgba(139,92,246,0.3)' }}>
+            <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, rgba(45,125,84,0.2), rgba(26,92,58,0.1))', border: '1px solid rgba(45,125,84,0.3)' }}>
               <h2 className="font-black text-white text-lg">Real-Life Roleplay 🎭</h2>
-              <p className="text-purple-300/70 text-sm mt-1">Practice real conversations with an AI playing different roles</p>
+              <p className="text-[#4db87e]/70 text-sm mt-1">Practice real conversations with an AI playing different roles</p>
             </div>
             {ROLEPLAY_SCENARIOS.map(scenario => (
               <button key={scenario.id}
@@ -212,8 +212,8 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
                     <p className="text-white font-bold">{scenario.title}</p>
                     <p className="text-slate-500 text-xs mt-0.5 truncate">{scenario.startingPrompt}</p>
                   </div>
-                  <div className="w-8 h-8 rounded-xl glass-light flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-500/20 transition-all">
-                    <ChevronRight size={15} className="text-slate-500 group-hover:text-indigo-400" />
+                  <div className="w-8 h-8 rounded-xl glass-light flex items-center justify-center flex-shrink-0 group-hover:bg-[#1a5c3a]/20 transition-all">
+                    <ChevronRight size={15} className="text-slate-500 group-hover:text-[#3d9e6b]" />
                   </div>
                 </div>
               </button>
@@ -270,7 +270,7 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
                   <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                     mission.level === 'beginner'     ? 'bg-green-500/15 text-green-400 border border-green-500/30' :
                     mission.level === 'intermediate' ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30' :
-                    mission.level === 'advanced'     ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30' :
+                    mission.level === 'advanced'     ? 'bg-purple-500/15 text-[#3d9e6b] border border-purple-500/30' :
                                                       'bg-red-500/15 text-red-400 border border-red-500/30'
                   }`}>
                     {mission.level.charAt(0).toUpperCase() + mission.level.slice(1)}
@@ -301,9 +301,9 @@ export default function HomeScreen({ onStartConversation, onNavigate }: Props) {
           <button key={item.label}
             onClick={() => !item.active && onNavigate(item.screen)}
             className={`flex flex-col items-center gap-1.5 transition-all ${
-              item.active ? 'text-indigo-400' : 'text-slate-600 hover:text-slate-400'
+              item.active ? 'text-[#3d9e6b]' : 'text-slate-600 hover:text-slate-400'
             }`}>
-            <div className={`p-2 rounded-xl transition-all ${item.active ? 'bg-indigo-500/15' : ''}`}>
+            <div className={`p-2 rounded-xl transition-all ${item.active ? 'bg-[#1a5c3a]/15' : ''}`}>
               <item.icon size={20} />
             </div>
             <span className="text-xs font-medium">{item.label}</span>

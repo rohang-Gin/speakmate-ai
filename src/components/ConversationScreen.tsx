@@ -218,7 +218,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
 
       {/* Fixed background glow */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-64 rounded-full bg-indigo-600/08 blur-3xl" />
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-64 rounded-full bg-[#1a5c3a]/08 blur-3xl" />
       </div>
 
       {/* Header */}
@@ -250,7 +250,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
           onClick={() => { if (autoSpeak) stopSpeaking(); setAutoSpeak(!autoSpeak) }}
           className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all ${
             autoSpeak
-              ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+              ? 'bg-[#1a5c3a]/20 text-[#3d9e6b] border border-[#1a5c3a]/30'
               : 'bg-slate-800 text-slate-500 border border-slate-700'
           }`}>
           {autoSpeak ? <Volume2 size={16} /> : <VolumeX size={16} />}
@@ -294,7 +294,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
         {messages.filter(m => m.content && !m.content.startsWith('[SYSTEM')).length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full py-20 text-center px-6">
             <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4 float"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              style={{ background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' }}>
               <Sparkles size={28} className="text-white" />
             </div>
             <p className="text-slate-300 font-semibold text-lg">Starting your session...</p>
@@ -309,14 +309,14 @@ export default function ConversationScreen({ config, onBack }: Props) {
         {isLoading && (
           <div className="flex gap-3">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-white text-xs font-black flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              style={{ background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' }}>
               AI
             </div>
             <div className="glass-light rounded-2xl rounded-tl-sm px-5 py-3.5 flex gap-1.5 items-center"
               style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="w-2 h-2 rounded-full bg-indigo-400 typing-dot" />
-              <span className="w-2 h-2 rounded-full bg-indigo-400 typing-dot" />
-              <span className="w-2 h-2 rounded-full bg-indigo-400 typing-dot" />
+              <span className="w-2 h-2 rounded-full bg-[#3d9e6b] typing-dot" />
+              <span className="w-2 h-2 rounded-full bg-[#3d9e6b] typing-dot" />
+              <span className="w-2 h-2 rounded-full bg-[#3d9e6b] typing-dot" />
             </div>
           </div>
         )}
@@ -367,11 +367,11 @@ export default function ConversationScreen({ config, onBack }: Props) {
           <div className="flex items-center gap-2 mb-2">
             <div className="flex gap-0.5">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-0.5 rounded-full bg-indigo-400"
+                <div key={i} className="w-0.5 rounded-full bg-[#3d9e6b]"
                   style={{ height: `${8 + (i % 2) * 8}px`, animation: `typing 0.8s ${i * 0.1}s ease-in-out infinite` }} />
               ))}
             </div>
-            <span className="text-indigo-400 text-xs font-medium">AI speaking</span>
+            <span className="text-[#3d9e6b] text-xs font-medium">AI speaking</span>
             <button onClick={stopSpeaking} className="text-slate-500 text-xs hover:text-slate-300 ml-auto transition-colors">stop</button>
           </div>
         )}
@@ -383,7 +383,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
             onKeyDown={handleKeyDown}
             placeholder={isListening ? '🔴 Listening...' : 'Type or speak your message...'}
             rows={1}
-            className="flex-1 text-white placeholder-slate-600 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-indigo-500/50 max-h-32"
+            className="flex-1 text-white placeholder-slate-600 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#1a5c3a]/50 max-h-32"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', minHeight: '44px' }}
           />
           {supported && (
@@ -446,7 +446,7 @@ function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (te
           ? 'bg-emerald-600 text-white'
           : ''
       }`}
-        style={!isUser ? { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' } : {}}>
+        style={!isUser ? { background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' } : {}}>
         {isUser ? 'You' : 'AI'}
       </div>
 
@@ -478,7 +478,7 @@ function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (te
           <div className="space-y-1.5 max-w-[85%]">
             {message.followUpQuestions.map((q, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-slate-400 px-1">
-                <ChevronRight size={11} className="mt-0.5 text-indigo-400 flex-shrink-0" />
+                <ChevronRight size={11} className="mt-0.5 text-[#3d9e6b] flex-shrink-0" />
                 <span className="italic">{q}</span>
               </div>
             ))}
@@ -510,8 +510,8 @@ function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (te
                 <span className="text-slate-300">{message.grammarCorrection.explanation}</span>
               </div>
               <div className="flex gap-2">
-                <span className="text-purple-400 font-semibold w-16 flex-shrink-0">Native:</span>
-                <span className="text-purple-300 italic">"{message.grammarCorrection.nativeSpeakerVersion}"</span>
+                <span className="text-[#3d9e6b] font-semibold w-16 flex-shrink-0">Native:</span>
+                <span className="text-[#4db87e] italic">"{message.grammarCorrection.nativeSpeakerVersion}"</span>
               </div>
             </div>
           </div>
@@ -520,10 +520,10 @@ function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (te
         {/* Vocab Suggestions */}
         {message.vocabSuggestions && message.vocabSuggestions.length > 0 && (
           <div className="max-w-[90%] rounded-2xl p-4"
-            style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)' }}>
+            style={{ background: 'rgba(45,125,84,0.08)', border: '1px solid rgba(45,125,84,0.25)' }}>
             <div className="flex items-center gap-1.5 mb-2.5">
-              <Lightbulb size={13} className="text-purple-400" />
-              <span className="text-purple-400 text-xs font-bold uppercase tracking-wide">Better Vocabulary</span>
+              <Lightbulb size={13} className="text-[#3d9e6b]" />
+              <span className="text-[#3d9e6b] text-xs font-bold uppercase tracking-wide">Better Vocabulary</span>
             </div>
             {message.vocabSuggestions.map((v, i) => (
               <div key={i} className="text-xs mb-1.5 flex flex-wrap gap-1 items-center">
@@ -531,7 +531,7 @@ function MessageBubble({ message, onReplay }: { message: Message, onReplay?: (te
                 <span className="text-slate-300 bg-slate-700/50 px-1.5 py-0.5 rounded-md">"{v.original}"</span>
                 <span className="text-slate-500">try:</span>
                 {v.alternatives.map((alt, j) => (
-                  <span key={j} className="text-purple-300 bg-purple-900/30 border border-purple-700/30 px-1.5 py-0.5 rounded-md">{alt}</span>
+                  <span key={j} className="text-[#4db87e] bg-[#0d2e1d]/30 border border-[#1a5c3a]/30 px-1.5 py-0.5 rounded-md">{alt}</span>
                 ))}
               </div>
             ))}

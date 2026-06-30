@@ -99,7 +99,7 @@ export default function HistoryScreen({ onBack }: Props) {
                         <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black flex-shrink-0 ${
                           msg.role === 'user' ? 'bg-emerald-600 text-white' : ''
                         }`}
-                          style={msg.role === 'assistant' ? { background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' } : {}}>
+                          style={msg.role === 'assistant' ? { background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' } : {}}>
                           {msg.role === 'user' ? 'U' : 'AI'}
                         </div>
                         <div className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${

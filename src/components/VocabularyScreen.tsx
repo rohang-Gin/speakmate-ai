@@ -33,7 +33,7 @@ export default function VocabularyScreen({ onBack }: Props) {
         </button>
         <h1 className="text-white font-black text-lg flex-1">Vocabulary Notebook</h1>
         <span className="text-xs font-semibold px-2.5 py-1 rounded-xl"
-          style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)' }}>
+          style={{ background: 'rgba(26,92,58,0.15)', color: '#a5b4fc', border: '1px solid rgba(26,92,58,0.3)' }}>
           {vocab.length} words
         </span>
       </div>
@@ -43,7 +43,7 @@ export default function VocabularyScreen({ onBack }: Props) {
           <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search words..."
-            className="w-full text-white placeholder-slate-600 rounded-2xl pl-10 pr-4 py-3.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+            className="w-full text-white placeholder-slate-600 rounded-2xl pl-10 pr-4 py-3.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#1a5c3a]/50"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }} />
         </div>
 

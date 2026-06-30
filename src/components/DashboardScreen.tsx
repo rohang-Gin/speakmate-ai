@@ -29,7 +29,7 @@ export default function DashboardScreen({ onBack }: Props) {
   return (
     <div className="min-h-screen bg-[#06080f] pb-10">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-64 rounded-full bg-indigo-600/08 blur-3xl" />
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-64 rounded-full bg-[#1a5c3a]/08 blur-3xl" />
       </div>
 
       {/* Header */}
@@ -46,8 +46,8 @@ export default function DashboardScreen({ onBack }: Props) {
         <div className="grid grid-cols-2 gap-3">
           {[
             { icon: Flame,          label: 'Day Streak',    value: progress.currentStreak, sub: `Best: ${progress.longestStreak}`,  color: '#f97316', bg: 'card-gradient-orange' },
-            { icon: Zap,            label: 'XP Points',     value: progress.xpPoints,       sub: `Level: ${progress.level}`,        color: '#a855f7', bg: 'card-gradient-purple' },
-            { icon: MessageCircle,  label: 'Sessions',      value: progress.totalSessions,  sub: `Avg score: ${avgScore}`,          color: '#6366f1', bg: 'card-gradient-blue'   },
+            { icon: Zap,            label: 'XP Points',     value: progress.xpPoints,       sub: `Level: ${progress.level}`,        color: '#3d9e6b', bg: 'card-gradient-purple' },
+            { icon: MessageCircle,  label: 'Sessions',      value: progress.totalSessions,  sub: `Avg score: ${avgScore}`,          color: '#1a5c3a', bg: 'card-gradient-blue'   },
             { icon: Clock,          label: 'Minutes',       value: progress.totalMinutes,   sub: 'speaking time',                   color: '#10b981', bg: 'card-gradient-green'  },
           ].map(s => (
             <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
@@ -64,18 +64,18 @@ export default function DashboardScreen({ onBack }: Props) {
         {/* Weekly Report Card */}
         {weeklyReport && weeklyReport.totalSessions > 0 && (
           <div className="rounded-3xl p-5"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))', border: '1px solid rgba(99,102,241,0.3)' }}>
+            style={{ background: 'linear-gradient(135deg, rgba(26,92,58,0.12), rgba(45,125,84,0.08))', border: '1px solid rgba(26,92,58,0.3)' }}>
             <div className="flex items-center gap-2 mb-4">
-              <CalendarDays size={16} className="text-indigo-400" />
+              <CalendarDays size={16} className="text-[#3d9e6b]" />
               <h3 className="text-white font-bold">This Week's Report</h3>
-              <span className="ml-auto text-xs text-indigo-400 font-semibold">Last 7 days</span>
+              <span className="ml-auto text-xs text-[#3d9e6b] font-semibold">Last 7 days</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Sessions',      value: weeklyReport.totalSessions,  sub: 'this week',         color: '#6366f1' },
+                { label: 'Sessions',      value: weeklyReport.totalSessions,  sub: 'this week',         color: '#1a5c3a' },
                 { label: 'Minutes',       value: weeklyReport.totalMinutes,   sub: 'speaking time',     color: '#10b981' },
                 { label: 'Avg Score',     value: weeklyReport.avgScore,       sub: 'out of 100',        color: '#f59e0b' },
-                { label: 'Avg Speed',     value: `${weeklyReport.avgWpm}`,    sub: 'words per minute',  color: '#a855f7' },
+                { label: 'Avg Speed',     value: `${weeklyReport.avgWpm}`,    sub: 'words per minute',  color: '#3d9e6b' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-3.5"
                   style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -87,7 +87,7 @@ export default function DashboardScreen({ onBack }: Props) {
             </div>
             <div className="mt-3 rounded-2xl p-3 flex items-center gap-2"
               style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <Mic size={13} className="text-purple-400 flex-shrink-0" />
+              <Mic size={13} className="text-[#3d9e6b] flex-shrink-0" />
               <p className="text-slate-400 text-xs">
                 You spoke <span className="text-white font-bold">{weeklyReport.totalWords.toLocaleString()} words</span> this week
                 {weeklyReport.avgWpm >= 120
@@ -105,7 +105,7 @@ export default function DashboardScreen({ onBack }: Props) {
           <div className="rounded-3xl p-5"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <div className="flex items-center gap-2 mb-5">
-              <TrendingUp size={16} className="text-indigo-400" />
+              <TrendingUp size={16} className="text-[#3d9e6b]" />
               <h3 className="text-white font-bold">Weekly Progress</h3>
             </div>
             <ResponsiveContainer width="100%" height={175}>
@@ -117,12 +117,12 @@ export default function DashboardScreen({ onBack }: Props) {
                   contentStyle={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontSize: 12 }}
                   labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#e2e8f0' }} />
                 <Line type="monotone" dataKey="grammar"    stroke="#22c55e" strokeWidth={2} dot={false} name="Grammar" />
-                <Line type="monotone" dataKey="vocabulary" stroke="#6366f1" strokeWidth={2} dot={false} name="Vocab" />
+                <Line type="monotone" dataKey="vocabulary" stroke="#1a5c3a" strokeWidth={2} dot={false} name="Vocab" />
                 <Line type="monotone" dataKey="overall"    stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3, fill: '#f59e0b' }} name="Overall" />
               </LineChart>
             </ResponsiveContainer>
             <div className="flex gap-5 mt-3 justify-center">
-              {[{ c: '#22c55e', l: 'Grammar' }, { c: '#6366f1', l: 'Vocab' }, { c: '#f59e0b', l: 'Overall' }].map(i => (
+              {[{ c: '#22c55e', l: 'Grammar' }, { c: '#1a5c3a', l: 'Vocab' }, { c: '#f59e0b', l: 'Overall' }].map(i => (
                 <div key={i.l} className="flex items-center gap-1.5 text-xs text-slate-500">
                   <div className="w-4 h-0.5 rounded-full" style={{ background: i.c }} />
                   {i.l}

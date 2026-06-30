@@ -253,11 +253,11 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         {sentences.length === 0 && status === 'loading' && (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-16 h-16 rounded-3xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              style={{ background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' }}>
               <span className="text-white text-2xl font-black">AI</span>
             </div>
             <div className="flex gap-1.5">
-              {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-indigo-400 typing-dot" style={{ animationDelay: `${i * 0.2}s` }} />)}
+              {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-[#3d9e6b] typing-dot" style={{ animationDelay: `${i * 0.2}s` }} />)}
             </div>
             <p className="text-slate-500 text-sm">Preparing your lesson...</p>
           </div>
@@ -273,9 +273,9 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
               <div className={`rounded-2xl p-4 ${isActive ? 'rounded-3xl p-5' : ''}`}
                 style={{
                   background: isActive
-                    ? 'linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.1))'
+                    ? 'linear-gradient(135deg, rgba(26,92,58,0.18), rgba(45,125,84,0.1))'
                     : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isActive ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.07)'}`,
+                  border: `1px solid ${isActive ? 'rgba(26,92,58,0.5)' : 'rgba(255,255,255,0.07)'}`,
                 }}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-bold px-2 py-0.5 rounded-lg"
@@ -283,7 +283,7 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
                     #{idx + 1}
                   </span>
                   {s.done && <CheckCircle size={15} className="text-emerald-400" />}
-                  {isActive && <span className="text-xs text-indigo-400 font-semibold">Repeat after me</span>}
+                  {isActive && <span className="text-xs text-[#3d9e6b] font-semibold">Repeat after me</span>}
                 </div>
                 <p className={`font-bold leading-relaxed ${isActive ? 'text-white text-xl' : 'text-slate-300 text-base'}`}>
                   "{s.target}"
@@ -293,8 +293,8 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
                     stopSpeaking()
                     speak(`Repeat after me: ${s.target}`, 0.82, voicePrefs.current.accent, voicePrefs.current.gender)
                   }}
-                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-indigo-300 transition-all"
-                    style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.25)' }}>
+                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#4db87e] transition-all"
+                    style={{ background: 'rgba(26,92,58,0.15)', border: '1px solid rgba(26,92,58,0.25)' }}>
                     <Volume2 size={12} /> Hear again
                   </button>
                 )}
@@ -337,7 +337,7 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         {sentences.length > 0 && status === 'loading' && (
           <div className="flex items-center gap-2 py-2 px-4">
             <div className="flex gap-1">
-              {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-indigo-400 typing-dot" style={{ animationDelay: `${i * 0.2}s` }} />)}
+              {[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#3d9e6b] typing-dot" style={{ animationDelay: `${i * 0.2}s` }} />)}
             </div>
             <p className="text-slate-500 text-xs">Loading next sentence...</p>
           </div>
@@ -404,7 +404,7 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         {status === 'showing' && !mobile.current && currentTarget && (
           <button onClick={handleRepeat}
             className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-white font-bold transition-all hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+            style={{ background: 'linear-gradient(135deg, #1a5c3a, #2d7d54)' }}>
             <Mic size={20} /> Click to Repeat
           </button>
         )}

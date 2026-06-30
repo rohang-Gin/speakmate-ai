@@ -31,14 +31,14 @@ export default function SessionReportCard({ report, onBack, onRestart }: Props) 
   const duration = Math.round(report.duration / 60)
   const overall = report.score.overall
   const grade = overall >= 90 ? 'Excellent! 🏆' : overall >= 75 ? 'Great Job! 🌟' : overall >= 60 ? 'Good Work! 👍' : 'Keep Practicing! 💪'
-  const gradeColor = overall >= 90 ? '#f59e0b' : overall >= 75 ? '#22c55e' : overall >= 60 ? '#3b82f6' : '#a855f7'
+  const gradeColor = overall >= 90 ? '#f59e0b' : overall >= 75 ? '#22c55e' : overall >= 60 ? '#3b82f6' : '#3d9e6b'
 
   return (
     <div className="min-h-screen bg-[#06080f] px-4 py-6 overflow-y-auto pb-12">
 
       {/* Confetti-like header */}
       <div className="relative rounded-3xl p-6 mb-5 text-center overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%)', border: '1px solid rgba(99,102,241,0.4)' }}>
+        style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%)', border: '1px solid rgba(26,92,58,0.4)' }}>
         <div className="absolute inset-0 shimmer pointer-events-none" />
         <div className="relative">
           <div className="w-20 h-20 mx-auto mb-4 rounded-3xl flex items-center justify-center"
@@ -46,7 +46,7 @@ export default function SessionReportCard({ report, onBack, onRestart }: Props) 
             <Trophy size={38} className="text-white" />
           </div>
           <h2 className="text-2xl font-black text-white">Session Complete!</h2>
-          <p className="text-indigo-300/70 text-sm mt-1">{duration} min · {report.messageCount} exchanges</p>
+          <p className="text-[#4db87e]/70 text-sm mt-1">{duration} min · {report.messageCount} exchanges</p>
           <p className="text-lg font-bold mt-2" style={{ color: gradeColor }}>{grade}</p>
         </div>
       </div>
@@ -74,13 +74,13 @@ export default function SessionReportCard({ report, onBack, onRestart }: Props) 
       <div className="rounded-3xl p-5 mb-4"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={16} className="text-indigo-400" />
+          <TrendingUp size={16} className="text-[#3d9e6b]" />
           <h3 className="text-white font-bold">Score Breakdown</h3>
         </div>
         <div className="flex justify-around">
           <ScoreRing score={report.score.grammar}      label="Grammar"    color="#22c55e" trackColor="rgba(34,197,94,0.15)" />
-          <ScoreRing score={report.score.vocabulary}   label="Vocab"      color="#6366f1" trackColor="rgba(99,102,241,0.15)" />
-          <ScoreRing score={report.score.fluency}      label="Fluency"    color="#a855f7" trackColor="rgba(168,85,247,0.15)" />
+          <ScoreRing score={report.score.vocabulary}   label="Vocab"      color="#1a5c3a" trackColor="rgba(26,92,58,0.15)" />
+          <ScoreRing score={report.score.fluency}      label="Fluency"    color="#3d9e6b" trackColor="rgba(61,158,107,0.15)" />
           <ScoreRing score={report.score.pronunciation} label="Pronun."   color="#f59e0b" trackColor="rgba(245,158,11,0.15)" />
           <ScoreRing score={report.score.confidence}   label="Confidence" color="#ec4899" trackColor="rgba(236,72,153,0.15)" />
         </div>
@@ -128,7 +128,7 @@ export default function SessionReportCard({ report, onBack, onRestart }: Props) 
           <div className="flex flex-wrap gap-2">
             {report.vocabularyLearned.map((word, i) => (
               <span key={i} className="text-xs px-3 py-1.5 rounded-xl font-medium"
-                style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.3)' }}>
+                style={{ background: 'rgba(26,92,58,0.15)', color: '#a5b4fc', border: '1px solid rgba(26,92,58,0.3)' }}>
                 {word}
               </span>
             ))}
