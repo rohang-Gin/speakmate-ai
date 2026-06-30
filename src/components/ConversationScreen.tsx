@@ -321,9 +321,12 @@ export default function ConversationScreen({ config, onBack }: Props) {
           </div>
         )}
         <div ref={messagesEndRef} />
+      </div>
 
-        {/* DEBUG PANEL */}
-        <div className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,0,0.2)' }}>
+
+      {/* DEBUG PANEL */}
+      <div className="px-4 pt-2 rounded-2xl overflow-hidden">
+        <div style={{ border: '1px solid rgba(255,255,0,0.2)', borderRadius: '16px', overflow: 'hidden' }}>
           <button onClick={() => setShowDebug(v => !v)}
             className="w-full flex items-center justify-between px-3 py-2"
             style={{ background: 'rgba(0,0,0,0.7)' }}>
@@ -331,7 +334,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
             <span className="text-yellow-600 text-xs">{showDebug ? '▲ Hide' : '▼ Show'}</span>
           </button>
           {showDebug && (
-            <div className="px-3 pb-3 pt-1" style={{ background: 'rgba(0,0,0,0.6)' }}>
+            <div className="px-3 pb-3 pt-1 max-h-40 overflow-y-auto" style={{ background: 'rgba(0,0,0,0.6)' }}>
               {debugLogs.length === 0
                 ? <p className="text-slate-600 text-xs">No logs yet...</p>
                 : debugLogs.map((l, i) => (
@@ -341,7 +344,6 @@ export default function ConversationScreen({ config, onBack }: Props) {
           )}
         </div>
       </div>
-
 
       {/* Mobile: Tap to Speak button */}
       {isMobile && waitingForTap && !aiSpeaking && (
