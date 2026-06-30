@@ -33,7 +33,7 @@ export function useConversation({
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
     inactivityTimerRef.current = setTimeout(() => {
       sendMessage('__inactivity__')
-    }, 30000)
+    }, 180000) // 3 minutes — was 30s which burned API quota
   }, [])
 
   const sendMessage = useCallback(async (userText: string) => {
@@ -161,10 +161,14 @@ export function useConversation({
       }
     } catch (err) {
       console.error(err)
+      const errText = err instanceof Error ? err.message : ''
+      const isRateLimit = errText.includes('429') || errText.includes('rate_limit')
       const errMsg: Message = {
         id: generateId(),
         role: 'assistant',
-        content: "I'm having a little trouble connecting. Please check your internet and try again!",
+        content: isRateLimit
+          ? "⏳ Too many requests — please wait 10–15 seconds and try again."
+          : "I'm having a little trouble connecting. Please check your internet and try again!",
         timestamp: Date.now(),
         followUpQuestions: [],
       }

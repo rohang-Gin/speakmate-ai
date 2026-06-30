@@ -83,7 +83,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
         sendMessage(`[SYSTEM: Start the conversation. Use this as your opening: "${startingMsg}". Respond in JSON format as instructed.]`)
       }, 800)
     }
-  }, [hasStarted, messages.length, config, sendMessage])
+  }, [hasStarted, messages.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const doStartListening = useCallback(() => {
     log('Mic started (tap button)')
@@ -150,7 +150,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
 
   useEffect(() => {
     if (messages.length > 1) resetInactivityTimer(sendMessage)
-  }, [messages, resetInactivityTimer, sendMessage])
+  }, [messages.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // WPM tracking — update whenever a user message is added
   useEffect(() => {
@@ -346,7 +346,7 @@ export default function ConversationScreen({ config, onBack }: Props) {
       </div>
 
       {/* Mobile: Tap to Speak button */}
-      {isMobile && waitingForTap && !aiSpeaking && (
+      {isMobile && !aiSpeaking && !isLoading && messages.length > 0 && (
         <div className="px-4 pb-2 flex justify-center">
           <button
             onClick={doStartListening}

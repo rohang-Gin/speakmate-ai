@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildSystemPrompt } from '@/lib/groq'
 import { AIResponse } from '@/types'
 
+// Collect all configured API keys in order
+function getApiKeys(): string[] {
+  const keys = [
+    process.env.GROQ_API_KEY,
+    process.env.GROQ_API_KEY_2,
+    process.env.GROQ_API_KEY_3,
+    process.env.GROQ_API_KEY_4,
+    process.env.GROQ_API_KEY_5,
+  ].filter((k): k is string => !!k)
+
+  // Deduplicate
+  return keys.filter((k, i) => keys.indexOf(k) === i)
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -9,58 +23,78 @@ export async function POST(req: NextRequest) {
 
     const systemPrompt = customSystemPrompt || buildSystemPrompt(mode, level, roleplayContext, interviewContext)
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
-        temperature: 0.8,
-        max_tokens: 1024,
-        response_format: { type: 'json_object' },
-      }),
+    const groqBody = JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.8,
+      max_tokens: 1024,
+      response_format: { type: 'json_object' },
     })
 
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error('Groq API error:', response.status, errText)
+    const keys = getApiKeys()
+    if (keys.length === 0) {
+      return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
+    }
+
+    let lastStatus = 500
+    for (let i = 0; i < keys.length; i++) {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${keys[i]}`,
+          'Content-Type': 'application/json',
+        },
+        body: groqBody,
+      })
+
+      lastStatus = response.status
+
       if (response.status === 429) {
-        return NextResponse.json({ error: 'rate_limit' }, { status: 429 })
+        console.warn(`Key ${i + 1}/${keys.length} rate limited — trying next`)
+        continue  // try next key
       }
-      return NextResponse.json({ error: `Groq error: ${response.status}` }, { status: 500 })
-    }
 
-    const completion = await response.json()
-    const raw = completion.choices?.[0]?.message?.content || '{}'
-
-    let parsed: AIResponse
-    try {
-      parsed = JSON.parse(raw)
-    } catch {
-      parsed = {
-        message: raw,
-        followUpQuestions: ['What do you think about that?'],
-        grammarCorrection: undefined,
-        vocabSuggestions: [],
-        isSessionEnd: false,
+      if (!response.ok) {
+        const errText = await response.text()
+        console.error(`Groq API error on key ${i + 1}:`, response.status, errText)
+        return NextResponse.json({ error: `Groq error: ${response.status}` }, { status: 500 })
       }
+
+      // Success
+      const completion = await response.json()
+      const raw = completion.choices?.[0]?.message?.content || '{}'
+
+      let parsed: AIResponse
+      try {
+        parsed = JSON.parse(raw)
+      } catch {
+        parsed = {
+          message: raw,
+          followUpQuestions: ['What do you think about that?'],
+          grammarCorrection: undefined,
+          vocabSuggestions: [],
+          isSessionEnd: false,
+        }
+      }
+
+      if (!parsed.message) {
+        parsed.message = "I'm here! Let's have a great conversation. How are you doing today?"
+      }
+
+      if (!parsed.followUpQuestions || parsed.followUpQuestions.length === 0) {
+        parsed.followUpQuestions = ['Can you tell me more?']
+      }
+
+      return NextResponse.json(parsed)
     }
 
-    if (!parsed.message) {
-      parsed.message = "I'm here! Let's have a great conversation. How are you doing today?"
-    }
+    // All keys exhausted
+    console.error(`All ${keys.length} API key(s) rate limited (429)`)
+    return NextResponse.json({ error: 'rate_limit' }, { status: 429 })
 
-    if (!parsed.followUpQuestions || parsed.followUpQuestions.length === 0) {
-      parsed.followUpQuestions = ['Can you tell me more?']
-    }
-
-    return NextResponse.json(parsed)
   } catch (error: unknown) {
     console.error('Chat API error:', error)
     const message = error instanceof Error ? error.message : 'Unknown error'
