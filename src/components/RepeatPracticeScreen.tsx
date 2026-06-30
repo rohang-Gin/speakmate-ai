@@ -100,6 +100,13 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
       log(`API response status: ${res.status}`)
       const data = await res.json()
       log(`Raw data keys: ${Object.keys(data).join(', ')}`)
+
+      if (!res.ok) {
+        log(`API ERROR 500: ${data.error || JSON.stringify(data)}`)
+        setStatus('showing')
+        return
+      }
+
       log(`data.content type: ${typeof data.content} | data.message type: ${typeof data.message}`)
 
       let parsed: { message: string; targetSentence?: string | null }
@@ -109,6 +116,12 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
       } catch (e) {
         log(`JSON parse failed: ${e}. Fallback to raw.`)
         parsed = { message: data.content || data.message || '' }
+      }
+
+      if (!parsed.message) {
+        log(`ERROR: parsed.message is empty/undefined — full data: ${JSON.stringify(data).slice(0,150)}`)
+        setStatus('showing')
+        return
       }
 
       messagesRef.current.push({ role: 'assistant', content: parsed.message })
