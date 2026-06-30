@@ -45,6 +45,7 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
   const [score, setScore]           = useState(0)
   const [waitingTap, setWaitingTap] = useState(false)
   const [debugLogs, setDebugLogs]   = useState<string[]>([])
+  const [showDebug, setShowDebug]   = useState(false)
   const sentenceIdRef  = useRef(0)
   const messagesRef    = useRef<TurnMessage[]>([])
   const voicePrefs     = useRef(getVoicePreferences())
@@ -323,13 +324,22 @@ export default function RepeatPracticeScreen({ tense, onBack }: Props) {
         <div ref={bottomRef} />
 
         {/* DEBUG PANEL */}
-        <div className="mt-4 rounded-2xl p-3" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,0,0.2)' }}>
-          <p className="text-yellow-400 text-xs font-bold mb-2">🐛 Debug Log</p>
-          {debugLogs.length === 0
-            ? <p className="text-slate-600 text-xs">No logs yet...</p>
-            : debugLogs.map((l, i) => (
-              <p key={i} className="text-green-400 text-xs font-mono leading-5 break-all">{l}</p>
-            ))}
+        <div className="mt-4 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,0,0.2)' }}>
+          <button onClick={() => setShowDebug(v => !v)}
+            className="w-full flex items-center justify-between px-3 py-2"
+            style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <span className="text-yellow-400 text-xs font-bold">🐛 Debug Log {debugLogs.length > 0 && `(${debugLogs.length})`}</span>
+            <span className="text-yellow-600 text-xs">{showDebug ? '▲ Hide' : '▼ Show'}</span>
+          </button>
+          {showDebug && (
+            <div className="px-3 pb-3 pt-1" style={{ background: 'rgba(0,0,0,0.6)' }}>
+              {debugLogs.length === 0
+                ? <p className="text-slate-600 text-xs">No logs yet...</p>
+                : debugLogs.map((l, i) => (
+                  <p key={i} className="text-green-400 text-xs font-mono leading-5 break-all">{l}</p>
+                ))}
+            </div>
+          )}
         </div>
       </div>
 
