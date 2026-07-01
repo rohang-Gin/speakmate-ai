@@ -27,13 +27,11 @@ export function useConversation({
     grammar: 85, vocabulary: 75, fluency: 80, pronunciation: 70, confidence: 75, overall: 77,
   })
   const [isSessionEnded, setIsSessionEnded] = useState(false)
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastCallTimeRef = useRef<number>(0)
 
-  const resetInactivityTimer = useCallback((sendMessage: (text: string) => void) => {
-    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
-    inactivityTimerRef.current = setTimeout(() => {
-      sendMessage('__inactivity__')
-    }, 180000) // 3 minutes — was 30s which burned API quota
+  // Inactivity timer removed — was causing unnecessary API calls
+  const resetInactivityTimer = useCallback((_sendMessage: (text: string) => void) => {
+    // no-op
   }, [])
 
   const sendMessage = useCallback(async (userText: string) => {
@@ -43,6 +41,13 @@ export function useConversation({
       console.log(`[${ts}] sendMessage BLOCKED: empty=${!userText.trim()} loading=${isLoading} ended=${isSessionEnded}`)
       return
     }
+    // Cooldown: block calls within 2 seconds of the last one
+    const now = Date.now()
+    if (now - lastCallTimeRef.current < 2000) {
+      console.log(`[${ts}] sendMessage BLOCKED: cooldown (${now - lastCallTimeRef.current}ms since last call)`)
+      return
+    }
+    lastCallTimeRef.current = now
 
     const isInactivity = userText === '__inactivity__'
     const isSystem = userText.startsWith('[SYSTEM:')
